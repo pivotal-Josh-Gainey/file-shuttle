@@ -1,6 +1,7 @@
 package com.jgainey.demo;
 
 
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,15 @@ public class MyController {
     @RequestMapping(method = RequestMethod.POST, value="/upload", consumes = {"multipart/form-data"},produces = "application/json")
     public ResponseEntity<String> importFast(@Valid @RequestParam("file") MultipartFile multiPartFile) {
 
+
+        new File("/tmp/scratch").mkdirs();
+        try {
+            FileUtils.cleanDirectory(new File("/tmp/scratch"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
         InputStream initialStream = null;
         try {
             initialStream = multiPartFile.getInputStream();
@@ -41,7 +51,7 @@ public class MyController {
         }
 
         fileName = multiPartFile.getOriginalFilename();
-        fullFilePath = "/tmp/" + fileName;
+        fullFilePath = "/tmp/scratch/" + fileName;
 
         File targetFile = new File(fullFilePath);
 
